@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#171717">
+<title>Vinted DealFinder</title>
+<style>
+:root{color-scheme:dark;--bg:#101010;--card:#1c1c1e;--line:#353538;--muted:#a1a1aa;--white:#fafafa;--accent:#b8f36b;--warn:#ffd166;--bad:#ff8c8c}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--white);font:16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:760px;margin:auto;padding:20px 15px calc(36px + env(safe-area-inset-bottom))}
+header{padding:10px 2px 20px}h1{font-size:29px;letter-spacing:-.8px;margin:0 0 6px}h2{font-size:18px;margin:0 0 12px}p{color:var(--muted);line-height:1.45;margin:6px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:16px;margin:12px 0}
+label{display:block;font-size:14px;color:#ddd;margin:12px 0 6px}
+input,select,textarea,button{font:inherit;border-radius:11px;border:1px solid #48484d;background:#29292c;color:var(--white);padding:12px;width:100%}
+input[type=checkbox]{width:auto;accent-color:var(--accent);transform:scale(1.1);margin-right:7px}
+button{font-weight:650;cursor:pointer;border:0;background:var(--accent);color:#17200c}
+button.secondary{background:#303034;color:white;border:1px solid #4a4a4f}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.brand-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px}.brand-grid label{margin:2px 0;font-size:14px}
+small,.small{font-size:12px;color:var(--muted)}.actions{display:flex;gap:8px;margin-top:10px}.actions button{flex:1}
+.listing{border:1px solid var(--line);border-radius:14px;padding:13px;margin:10px 0;background:#202023}
+.listing h3{font-size:16px;margin:0 0 5px}.pill{display:inline-block;border-radius:20px;background:#343438;padding:4px 8px;font-size:12px;margin:2px 3px 5px 0}.score{font-size:24px;font-weight:800;color:var(--accent)}
+.warning{color:var(--warn)}.danger{color:var(--bad)}.empty{padding:18px;text-align:center;color:var(--muted)}
+a{color:var(--accent);word-break:break-word}
+details summary{cursor:pointer;font-weight:650}
+hr{border:0;border-top:1px solid var(--line);margin:14px 0}
+</style>
+</head>
+<body><main>
+<header>
+  <h1>Vinted DealFinder</h1>
+  <p>Marken-Deals bewerten. Angebote werden nicht automatisch von Vinted abgerufen; füge Links und Angaben selbst ein oder nutze eine ausdrücklich autorisierte Datenquelle.</p>
+</header>
+
+<section class="card">
+<h2>1 · Deine Suche</h2>
+<div class="grid">
+ <div><label for="maxPrice">Max. Artikelpreis (€)</label><input id="maxPrice" type="number" min="0" value="25" step="1"></div>
+ <div><label for="size">Größe (optional)</label><input id="size" placeholder="z. B. W32/L32, M"></div>
+</div>
+<div class="grid">
+ <div><label for="category">Kategorie</label><select id="category"><option>Alle</option><option>Jeans</option><option>Hosen</option><option>Hoodies</option><option>T-Shirts</option><option>Jacken</option><option>Sneaker</option></select></div>
+ <div><label for="conditionFilter">Mindestzustand</label><select id="conditionFilter"><option value="all">Alle</option><option value="good">Gut oder besser</option><option value="verygood" selected>Sehr gut oder besser</option><option value="new">Wie neu / neu</option></select></div>
+</div>
+<label>Marken auswählen</label>
+<div class="brand-grid" id="brands"></div>
+<div class="actions"><button id="selectAll" class="secondary" type="button">Alle</button><button id="selectNone" class="secondary" type="button">Keine</button></div>
+</section>
+
+<section class="card">
+<h2>2 · Angebot hinzufügen</h2>
+<p class="small">Trage die Angaben aus einem Angebot ein. Vergleichspreis = grobe Schätzung ähnlicher gebrauchter Artikel, nicht Neupreis.</p>
+<label for="title">Titel</label><input id="title" placeholder="z. B. Levi’s 501 Jeans">
+<div class="grid">
+ <div><label for="brand">Marke</label><select id="brand"></select></div>
+ <div><label for="price">Artikelpreis (€)</label><input id="price" type="number" min="0" step=".01" placeholder="15"></div>
+ <div><label for="shipping">Versand (€)</label><input id="shipping" type="number" min="0" step=".01" placeholder="4.50"></div>
+ <div><label for="fees">Weitere Gebühren (€)</label><input id="fees" type="number" min="0" step=".01" placeholder="0"></div>
+ <div><label for="comparison">Vergleichspreis (€)</label><input id="comparison" type="number" min="0" step=".01" placeholder="35"></div>
+ <div><label for="itemSize">Größe</label><input id="itemSize" placeholder="W32/L32 oder M"></div>
+</div>
+<label for="condition">Zustand</label><select id="condition"><option>Wie neu</option><option>Neu mit Etikett</option><option>Sehr gut</option><option>Gut</option><option>Befriedigend</option><option>Unbekannt</option></select>
+<label for="seller">Verkäuferbewertung (optional, z. B. 4.9)</label><input id="seller" type="number" min="0" max="5" step=".1" placeholder="4.9">
+<label for="description">Beschreibung / Hinweise (optional)</label><textarea id="description" rows="2" placeholder="z. B. kleine Gebrauchsspuren, keine Rechnung"></textarea>
+<label for="url">Direkter Angebotslink</label><input id="url" type="url" placeholder="https://www.vinted.de/items/...">
+<button id="add" style="margin-top:14px">Angebot bewerten & hinzufügen</button>
+<div class="actions"><button class="secondary" id="export" type="button">CSV exportieren</button><button class="secondary" id="clear" type="button">Alle löschen</button></div>
+</section>
+
+<section class="card">
+<h2>3 · Beste Deals</h2>
+<p class="small">Punkte sind eine Vorauswahl, kein Echtheitsnachweis. Risiko-Hinweise werden deutlich markiert.</p>
+<div id="results" class="empty">Noch keine Angebote hinzugefügt.</div>
+</section>
+
+<section class="card">
+<details>
+<summary>Wie funktioniert die Bewertung?</summary>
+<p>Der Score berücksichtigt Preis und Vergleichspreis, Zustand, Gesamtkosten inklusive Versand und Gebühren sowie die Größe. Verdächtige Begriffe, ungewöhnlich niedrige Preise oder eine niedrige Verkäuferbewertung lösen Warnhinweise aus. Das kann Betrug oder Fälschungen nicht sicher erkennen.</p>
+<hr>
+<p><b>Automatische Live-Suche:</b> Diese Datei ruft Vinted nicht selbst ab. Vinted untersagt nicht autorisierte Bots und Scraping. Für echte automatische Aktualisierungen brauchst du eine von Vinted autorisierte Schnittstelle oder einen Anbieter, der diese Nutzung ausdrücklich erlaubt.</p>
+<p><a href="https://www.vinted.de/" target="_blank" rel="noopener">Vinted öffnen</a> · <a href="https://www.vinted.de/help" target="_blank" rel="noopener">Vinted Hilfe</a></p>
+</details>
+</section>
+<footer class="small">Die Angebote bleiben in diesem Browser auf diesem Gerät gespeichert. Teile die Datei nicht mit privaten Verkäuferdaten.</footer>
+</main>
+<script>
+const BRANDS=["Levi’s","Carhartt","Carhartt WIP","Nike","Adidas","Dickies","Ralph Lauren","The North Face","New Balance","Diesel","Supreme","Essentials","Vans","Converse","Champion","Polo Ralph Lauren","Arc'teryx","Patagonia","Hugo Boss","Calvin Klein","Fred Perry","Stone Island"];
+const preferred=["Levi’s","Carhartt","Carhartt WIP","Nike","Adidas","Dickies","Ralph Lauren","The North Face","New Balance","Diesel","Supreme","Essentials","Vans","Converse","Champion","Polo Ralph Lauren","Arc'teryx","Patagonia","Hugo Boss","Calvin Klein","Fred Perry","Stone Island"];
+const $=id=>document.getElementById(id);
+let listings=[];
+const norm=s=>String(s||"").toLowerCase().replaceAll("’","'").replace(/\s+/g," ").trim();
+function initBrands(){
+ $("brands").innerHTML=BRANDS.map(b=>`<label><input type="checkbox" value="${esc(b)}" checked> ${esc(b)}</label>`).join("");
+ $("brand").innerHTML=BRANDS.map(b=>`<option>${esc(b)}</option>`).join("");
+}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function selectedBrands(){return [...$("brands").querySelectorAll("input:checked")].map(x=>x.value)}
+function score(x){
+ const flags=[];let s=0;const max=Number($("maxPrice").value)||25;
+ if(!selectedBrands().some(b=>norm(b)===norm(x.brand))) flags.push("Marke ist derzeit nicht ausgewählt");
+ if(x.price==null) flags.push("Preis fehlt");
+ else s+=x.price<=max?35:Math.max(0,35-(x.price-max)*1.2);
+ if(x.comparison>0&&x.price!=null){const discount=(x.comparison-x.price)/x.comparison;s+=Math.max(0,Math.min(35,discount*70));if(x.price>x.comparison)flags.push("Teurer als Vergleichspreis");}
+ else flags.push("Vergleichspreis fehlt");
+ const c=norm(x.condition);
+ if(["wie neu","neu mit etikett","sehr gut","new with tags","like new","very good"].includes(c))s+=25;
+ else if(c==="gut")s+=15;else flags.push("Zustand prüfen");
+ const total=(x.price||0)+(x.shipping||0)+(x.fees||0);
+ if(x.price!=null)s+=total<=max+5?20:Math.max(0,20-(total-max-5)*.8);
+ const target=norm($("size").value), sz=norm(x.size);
+ if(target){if(target===sz)s+=10;else flags.push(sz?"Größe stimmt nicht genau überein":"Größe fehlt");}
+ else if(sz)s+=5;
+ const suspicious=["replica","fake","1:1","dupe","imitat","plagiat","authenticity not guaranteed","keine echtheit","fälschung"];
+ if(suspicious.some(t=>norm(x.title+" "+x.description).includes(t)))flags.push("ECHTHEIT PRÜFEN: verdächtiger Begriff");
+ if(x.price!=null&&x.comparison>0&&x.price<x.comparison*.25)flags.push("ECHTHEIT/SCAM PRÜFEN: ungewöhnlich niedriger Preis");
+ if(x.seller!=null&&x.seller<4)flags.push("Verkäuferbewertung niedrig – Profil prüfen");
+ if(x.url&&!/^https?:\/\//i.test(x.url))flags.push("Link ist ungültig");
+ const risk=flags.some(f=>f.startsWith("ECHTHEIT"));
+ return {score:Math.max(0,Math.min(100,Math.round(s))),total,flags,risk};
+}
+function filtered(){
+ const chosen=selectedBrands(), max=Number($("maxPrice").value)||Infinity, size=norm($("size").value), cond=$("conditionFilter").value;
+ return listings.map(x=>({...x,...score(x)})).filter(x=>chosen.some(b=>norm(b)===norm(x.brand)) && (x.price==null||x.price<=max) && (!size||norm(x.size)===size) && (cond==="all"||(cond==="good"?["gut","sehr gut","wie neu","neu mit etikett"].includes(norm(x.condition)):(cond==="verygood"?["sehr gut","wie neu","neu mit etikett"].includes(norm(x.condition)):["wie neu","neu mit etikett"].includes(norm(x.condition)))))).sort((a,b)=>(a.risk-b.risk)||(b.score-a.score));
+}
+function render(){
+ const res=filtered();
+ if(!res.length){$("results").className="empty";$("results").textContent=listings.length?"Keine Angebote passen zu deinen Filtern.":"Noch keine Angebote hinzugefügt.";return;}
+ $("results").className="";
+ $("results").innerHTML=res.map(x=>`<article class="listing"><div class="score">${x.score}/100</div><h3>${esc(x.title||x.brand)}</h3><span class="pill">${esc(x.brand)}</span><span class="pill">${esc(x.condition)}</span><span class="pill">${esc(x.size||"Größe offen")}</span><p>Artikel: ${x.price==null?"—":x.price.toFixed(2)+" €"} · Versand: ${(x.shipping||0).toFixed(2)} € · Gebühren: ${(x.fees||0).toFixed(2)} €</p><p><b>Gesamt: ${x.total.toFixed(2)} €</b></p><p class="${x.risk?"danger":x.flags.length?"warning":""}">${x.flags.length?x.flags.map(esc).join(" · "):"Keine automatischen Warnungen"}</p>${x.description?`<p>${esc(x.description)}</p>`:""}${x.url&&/^https?:\/\//i.test(x.url)?`<a href="${esc(x.url)}" target="_blank" rel="noopener">Angebot bei Vinted öffnen ↗</a>`:"<span class='small'>Kein gültiger Angebotslink</span>"}<div class="actions"><button class="secondary" data-remove="${x.id}">Entfernen</button></div></article>`).join("");
+ $("results").querySelectorAll("[data-remove]").forEach(b=>b.onclick=()=>{listings=listings.filter(x=>x.id!==b.dataset.remove);save();render();});
+}
+function save(){try{localStorage.setItem("vinted-dealfinder-items",JSON.stringify(listings))}catch(e){}}
+function load(){try{listings=JSON.parse(localStorage.getItem("vinted-dealfinder-items")||"[]")}catch(e){listings=[]}}
+$("add").onclick=()=>{
+ const price=$("price").value.trim();
+ if(!price||!Number.isFinite(Number(price))||Number(price)<0){alert("Bitte gib einen gültigen Artikelpreis ein.");return;}
+ const x={id:String(Date.now())+Math.random().toString(16).slice(2),title:$("title").value.trim()||$("brand").value,brand:$("brand").value,price:Number(price),shipping:Number($("shipping").value)||0,fees:Number($("fees").value)||0,comparison:Number($("comparison").value)||0,size:$("itemSize").value.trim(),condition:$("condition").value,seller:$("seller").value===""?null:Number($("seller").value),description:$("description").value.trim(),url:$("url").value.trim()};
+ listings.push(x);save();render();
+ ["title","price","shipping","fees","comparison","itemSize","seller","description","url"].forEach(id=>$(id).value="");
+};
+$("selectAll").onclick=()=>{$("brands").querySelectorAll("input").forEach(x=>x.checked=true);render()};
+$("selectNone").onclick=()=>{$("brands").querySelectorAll("input").forEach(x=>x.checked=false);render()};
+$("brands").onchange=render;
+["maxPrice","size","conditionFilter"].forEach(id=>$(id).addEventListener("input",render));
+$("clear").onclick=()=>{if(confirm("Alle gespeicherten Angebote löschen?")){listings=[];save();render()}};
+$("export").onclick=()=>{
+ const rows=filtered();const headers=["Titel","Marke","Preis","Versand","Gebühren","Vergleichspreis","Zustand","Größe","Score","Gesamtkosten","Warnungen","URL"];
+ const data=rows.map(x=>[x.title,x.brand,x.price,x.shipping,x.fees,x.comparison,x.condition,x.size,x.score,x.total,x.flags.join("; "),x.url]);
+ const csv=[headers,...data].map(r=>r.map(v=>'"'+String(v??"").replaceAll('"','""')+'"').join(";")).join("\r\n");
+ const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"});
+ const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="vinted-deals.csv";a.click();URL.revokeObjectURL(a.href);
+};
+initBrands();load();render();
+</script></body></html>
